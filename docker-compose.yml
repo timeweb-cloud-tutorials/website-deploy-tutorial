@@ -9,9 +9,9 @@ services:
             - web
 
     web:
+        restart: always
         build:
             context: ./backend
             dockerfile: Dockerfile
-        command: gunicorn --workers 3 -b 0.0.0.0:8000 backend.wsgi
         expose:
-            - 8000
+            - "8000"

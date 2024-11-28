@@ -9,3 +9,5 @@ ENV PYTHONBUFFERED 1
 RUN mkdir app
 WORKDIR /app
 COPY . /app
+
+CMD gunicorn --config=gunicorn_config.py backend.wsgi
