@@ -15,14 +15,12 @@
 
  + Настроим фронтенд и бекенд части;
  + Настроим docker-контейнеры;
- + Настроим DNS домена.
 
 # Необходимые требования
 Начнем с главного:
 
-1. Доменное имя - адрес вашего сайта в интернете;
-2. Аккаунт в Timeweb Cloud - [зарегистрироваться можно по этой ссылке](https://timeweb.cloud/my/projects);
-3. VDS - облачный сервер с IPv4, [создать можно по этой ссылке](https://timeweb.cloud/my/servers/create).
+1. Аккаунт в Timeweb Cloud - [зарегистрироваться можно по этой ссылке](https://timeweb.cloud/my/projects);
+2. VDS - облачный сервер с IPv4, [создать можно по этой ссылке](https://timeweb.cloud/my/servers/create).
 
  > Я рекомендую прочитать данную статью полностью, перед тем как приступать к развертыванию. Это даст вам понять, что вас ждет и как лучше поступить в вашем конкретном случае.
 
@@ -90,48 +88,6 @@ CMD gunicorn --workers 3 -b 0.0.0.0:8000 config.wsgi
 
 И абсолютно также существует файл `backend/.dockerignore`.
 
-## Создание контейнера для nginx
-Nginx - это веб сервер.
-
-Существует файл nginx/nginx.conf:
-
-```conf
-events {
-	worker_connections 1024;
-}
-
-http {
-	server {
-		listen 80;
-
-		server_name tehnodrop.ru;
-
-		location / {
-			proxy_pass http://backend:8000;
-			proxy_set_header Host $host;
-			proxy_set_header X-Real-IP $remote_addr;
-			proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-			proxy_set_header x-Forwarded-Proto $scheme;
-		}
-
-		location /frontend/ {
-			proxy_pass http://frontend:3000;
-			proxy_set_header Host $host;
-			proxy_set_header X-Real-IP $remote_addr;
-			proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-			proxy_set_header x-Forwarded-Proto $scheme;
-		}
-	}
-}
-```
-
-И создадим Dockerfile:
-
-```Dockerfile
-FROM nginx:alpine
-COPY nginx.conf /etc/nginx/nginx.conf
-```
-
 ## Создание docker-compose
 Для того, чтобы наши докер контейнеры работали вместе, есть файл docker-compose.yml:
 
@@ -154,14 +110,4 @@ services:
             dockerfile: Dockerfile
         ports:
             - "8000:8000"
-
-    nginx:
-        build:
-            context: ./nginx
-            dockerfile: Dockerfile
-        ports:
-            - "80:80"
-        depends_on:
-            - frontend
-            - backend
 ```
