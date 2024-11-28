@@ -1,11 +1,6 @@
 version: '3.8'
 
 services:
-    system:
-        build:
-            context: ./system
-            dockerfile: Dockerfile
-
     frontend:
         build:
             context: ./frontend
@@ -14,6 +9,8 @@ services:
              - "3000:3000"
         depends_on:
             - backend
+        expose:
+            - 3000
 
     backend:
         build:
@@ -21,16 +18,14 @@ services:
             dockerfile: Dockerfile
         ports:
             - "8000:8000"
+        expose:
+            - 8000
 
     nginx:
-        image: nginx
-        volumes:
-            - /nginx/conf.d:/etc/nginx/conf.d
-            - /nginx/ssl:/etc/nginx/ssl
+        build: ./nginx
         ports:
-            - "80:80"
+            - 1337:80
         depends_on:
             - backend
             - frontend
-            - system
-    
+
