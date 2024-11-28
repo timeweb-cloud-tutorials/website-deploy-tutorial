@@ -24,10 +24,6 @@ services:
 
     nginx:
         image: nginx
-        restart: unless-stopped
-        build:
-            context: ./nginx
-            dockerfile: Dockerfile
         volumes:
             - /nginx/conf.d:/etc/nginx/conf.d
             - /nginx/ssl:/etc/nginx/ssl
@@ -37,3 +33,4 @@ services:
             - backend
             - frontend
             - system
+    

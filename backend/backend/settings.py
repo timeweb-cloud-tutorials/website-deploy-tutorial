@@ -25,7 +25,7 @@ SECRET_KEY = "django-insecure-uvv#ee_l#b9+7%o8f22vl9a+8ojl-4_#u)&p6l=6@jy7vjxp2x
 DEBUG = True
 
 ALLOWED_HOSTS = [
-	"109.68.212.254"
+	"109.68.212.254", 'tehnodrop.ru', 'localhost', '0.0.0.0'
 ]
 
 
