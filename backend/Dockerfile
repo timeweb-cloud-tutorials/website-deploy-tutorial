@@ -8,4 +8,4 @@ RUN mkdir app
 WORKDIR /app
 COPY . /app
 
-CMD gunicorn --workers 3 -b 0.0.0.0:8000 config.wsgi
+CMD gunicorn --workers 3 -b 0.0.0.0:8000 backend.wsgi
