@@ -1,36 +1,28 @@
 version: '3.8'
 
 services:
-    frontend:
-        build:
-            context: ./frontend
-            dockerfile: Dockerfile
-        depends_on:
-            - backend
-        ports:
-            - 3000:3000
-        expose:
-            - 3000
+    # frontend:
+    #     build:
+    #         context: ./frontend
+    #         dockerfile: Dockerfile
+    #     depends_on:
+    #         - backend
+    #     ports:
+    #         - 3000:3000
+    #     expose:
+    #         - 3000
 
     backend:
         build:
             context: ./backend
             dockerfile: Dockerfile
-        volumes:
-            - nginx_conf:/backend/nginx
-        ports:
-            - 8000:8000
+        command: gunicorn --workers 3 -b 0.0.0.0:8000 backend.wsgi
         expose:
             - 8000
 
     nginx:
-        restart: always
-        image: nginx:1.19.0-alpine
-        volumes:
-            - nginx_conf:/etc/nginx/conf.d/
+        build: ./nginx
         ports:
-            - 80:80
+            - 1337:80
         depends_on:
             - backend
-            - frontend
-
