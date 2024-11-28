@@ -103,17 +103,8 @@ events {
 http {
 	server {
 		listen 80;
+
 		server_name tehnodrop.ru;
-
-		return 301 https://$host$redirect_uri;
-	}
-
-	server {
-		listen 443 ssl;
-		server_name tehnodrop.ru;
-
-		ssl_certificate /etc/letsencrypt/live/tehnodrop.ru/fullchain.pem;
-		ssl_certificate_key /etc/letsencrypt/live/tehnodrop.ru/privkey.pem;
 
 		location / {
 			proxy_pass http://backend:8000;
@@ -165,16 +156,8 @@ services:
             context: ./nginx
             dockerfile: Dockerfile
         ports:
-            - "443:443"
+            - "80:80"
         depends_on:
             - frontend
             - backend
-
-    certbot:
-        image: certbot/certbot
-        volumes:
-            - ./certbot/conf:/etc/letsencrypt
-            - ./certbot/www:/var/www/certbot
-        entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
-
 ```
