@@ -8,7 +8,7 @@ services:
         depends_on:
             - backend
         ports:
-            - 3000
+            - 3000:3000
         expose:
             - 3000
 
@@ -16,18 +16,20 @@ services:
         build:
             context: ./backend
             dockerfile: Dockerfile
+        volumes:
+            - nginx_conf:/backend/nginx
         ports:
-            - 8000
+            - 8000:8000
         expose:
             - 8000
 
     nginx:
-        build: ./nginx
+        restart: always
+        image: nginx:1.19.0-alpine
+        volumes:
+            - nginx_conf:/etc/nginx/conf.d/
         ports:
             - 80:80
-        links:
-            - backend:backend
-            - frontend:frontend
         depends_on:
             - backend
             - frontend
