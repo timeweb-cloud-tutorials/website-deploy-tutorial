@@ -1,4 +1,4 @@
 FROM nginx:alpine
 
 WORKDIR .
-COPY ./nginx.conf /etc/nginx/nginx.conf
+COPY ./project /etc/nginx/sites-enabled/
