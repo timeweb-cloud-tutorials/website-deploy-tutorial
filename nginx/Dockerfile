@@ -1,3 +1,5 @@
 FROM nginx:alpine
-COPY nginx.conf /etc/nginx/nginx.conf
-RUN cat nginx.conf > /etc/nginx/nginx.conf
+
+WORKDIR .
+COPY ./nginx.conf /etc/nginx/nginx.conf
+RUN cat nginx/nginx.conf > /etc/nginx/nginx.conf
