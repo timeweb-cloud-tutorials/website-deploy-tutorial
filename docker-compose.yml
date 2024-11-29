@@ -8,6 +8,8 @@ services:
             dockerfile: Dockerfile
         ports:
             - 8000:8000
+        networks:
+            - nginx_network
 
     nginx:
         build: ./nginx
@@ -15,4 +17,9 @@ services:
             - "8000:80"
         depends_on:
             - backend
+        networks:
+            - nginx_network
 
+networks:
+    nginx_network:
+        driver: bridge
