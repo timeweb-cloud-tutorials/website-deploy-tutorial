@@ -1,6 +1,6 @@
 server {
 	listen 80;
-	server_name habratube.site;
+	server_name tehnodrop.ru;
 
 	location / {
 		proxy_pass http://localhost:8000;
