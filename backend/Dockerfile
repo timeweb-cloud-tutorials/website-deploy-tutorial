@@ -10,6 +10,4 @@ RUN mkdir app
 WORKDIR /app
 COPY . /app
 
-EXPOSE 8000
-
 CMD gunicorn --config=gunicorn_config.py backend.wsgi
