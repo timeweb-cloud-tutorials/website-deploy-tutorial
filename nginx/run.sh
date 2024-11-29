@@ -1,4 +1,4 @@
-sudo cp myproject -r /etc/nginx/sites-available/
-sudo ln -s /etc/nginx/sites-available/myproject /etc/nginx/sites-enabled
+sudo cp default -r /etc/nginx/sites-available/
+sudo ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled
 sudo nginx -t
 sudo systemctl restart nginx
