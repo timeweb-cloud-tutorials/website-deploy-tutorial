@@ -59,7 +59,7 @@ ssh root@<ip>
 4. Nginx — веб-сервер.
 
 ```bash
-sudo apt install nginx certbot
+sudo apt install nginx certbot python3-certbot-nginx
 sudo snap install docker
 ```
 

@@ -1,6 +1,6 @@
 server {
 	listen 80;
-	server_name prospero365.tw1.su;
+	server_name hardtobecoder.tw1.su;
 
 	location / {
 		proxy_pass http://localhost:8000;
