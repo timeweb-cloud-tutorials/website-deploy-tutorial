@@ -8,9 +8,9 @@
 
 Для этого мы выполним следующие шаги:
 
- + Настроим Frontend (клиент) и Backend (сервер) части;
+ + Создадим пример Frontend (NextJS) и Backend (Django) сайтов;
  + Настроим Docker-контейнеры;
- + Настроим Nginx (сервер) и LetsEncrypt (SSL-сертификаты).
+ + Настроим Nginx (сервер) и LetsEncrypt (SSL-сертификат).
 
 # Необходимые требования
 Начнём с главного:
@@ -59,7 +59,7 @@ ssh root@<ip>
 4. Nginx — веб-сервер.
 
 ```bash
-sudo apt install nginx
+sudo apt install nginx certbot
 sudo snap install docker
 ```
 
@@ -116,11 +116,12 @@ sudo systemctl start ssh
 sudo systemctl enable ssh
 ```
 
-После вы должны создать на сервере директорию SSH в домашней директории юзера (будучи из-под аккаунта администратора) и добавить публичный ключ, который мы сгенерировали ранее, в файл authorized_keys. А также изменить права:
+После, вы должны создать на сервере директорию SSH в домашней директории юзера (будучи из-под аккаунта администратора) и добавить публичный ключ, который мы сгенерировали ранее, в файл authorized_keys. А также изменить права:
 
 ```bash
 mkdir -p /home/<username>/.ssh && touch /home/<username>/.ssh/authorized_keys
 chmod 700 /home/<username>/.ssh && chmod 600 /home/<username>/.ssh/authorized_keys
+chown -R <username>:<username> /home/<username>/
 chown -R <username>:<username> /home/<username>/.ssh
 ```
 
@@ -171,21 +172,6 @@ maxretry = 9
 sudo systemctl restart fail2ban
 ```
 
-## Смена порта SSH
-Злоумышленник изначально будет пробовать 22 порт — порт сервиса ssh по умолчанию. Чтобы не допустить взлома, надо сменить его.
-
-Поэтому в `/etc/ssh/sshd_config` поменяйте следующее значение:
-
-```bash
-Port 9009 # поменяйте с 22 на любой свободный
-```
-
-И перезапустим ssh:
-
-```bash
-sudo systemctl restart ssh
-```
-
 # Контейнеризация
 Основная часть **установки сайта на VDS-сервер** — это настройка контейнеризации через Docker.
 
@@ -207,13 +193,13 @@ git clone https://github.com/alexeev-prog/website-deploy-tutorial
 
 ```python
 ALLOWED_HOSTS = [
-	"109.68.212.254", 'prospero365.tw1.su', 'localhost', '0.0.0.0'
+	"109.68.212.254", 'hardtobecoder.tw1.su', 'localhost', '0.0.0.0'
 ]
 ```
 
-`109.68.212.254` замените на IP-адрес сервера, prospero365.tw1.su на ваш домен.
+`109.68.212.254` замените на IP-адрес сервера, hardtobecoder.tw1.su на ваш домен.
 
-## Создание Docker-контейнера для Frontend (клиентская часть)а
+## Создание Docker-контейнера для Frontend (клиентская часть)
 В директории frontend есть файл Dockerfile, который отвечает за установку модулей и запуск приложения:
 
 ```Dockerfile
@@ -235,8 +221,8 @@ CMD ["npm", "run", "start"]
 
 Также, есть файл `frontend/.Dockerignore`, который копирует `frontend/.gitignore`.
 
-## Создание Docker-контейнера для Backend (серверная часть)а
-Теперь создадим контейнер для серверной части на Django. Аналогично с Frontend (клиентская часть), есть Dockerfile, который выглядит следующим образом:
+## Создание Docker-контейнера для Backend (серверная часть)
+Теперь рассмотрим контейнер для серверной части на Django. Аналогично с Frontend (клиентская часть), есть Dockerfile, который выглядит следующим образом:
 
 ```Dockerfile
 FROM python:3.9
@@ -284,21 +270,15 @@ services:
 
 Docker-compose — этой скрипт на python, который позволяет запускать несколько Docker-контейнеров и настраивать их совместную работу.
 
-# Nginx
+# Настройка Nginx
 Nginx — это веб-сервер. При обслуживании Django-приложения Nginx выступает в качестве обратного прокси-сервера: отвечает за обработку входящих запросов и их переадресацию.
-
-Установка:
-
-```bash
-sudo apt install nginx
-```
 
 В директории `nginx` есть два файла — `default` и `create.sh`. `default` является файлом конфигурации нашего сервера:
 
 ```
 server {
 	listen 80;
-	server_name prospero365.tw1.su;
+	server_name hardtobecoder.tw1.su;
 
 	location / {
 		proxy_pass http://localhost:8000;
@@ -310,7 +290,7 @@ server {
 }
 ```
 
-Замените prospero365.tw1.su на ваш домен, а 8000 на нужный вам порт (в зависимости от того, какой вы указали в Dockerfile Backend'а или Frontend'а).
+Замените hardtobecoder.tw1.su на ваш домен, а 8000 на нужный вам порт (в зависимости от того, какой вы указали в Dockerfile Backend'а или Frontend'а).
 
 После этого посмотрим файл create.sh — баш скрипт для установки и настройки прокси-сервера Nginx и загрузки SSL-сертификата:
 
@@ -318,13 +298,13 @@ server {
 sudo rm -rf /etc/nginx/sites-enabled/default # удаляем старую конфигурацию
 sudo cp default -r /etc/nginx/sites-available/ # копируем конфигурацию
 sudo ln -s /etc/nginx/sites-available/default /etc/nginx/sites-enabled # создаем ссылку в каталог включенных сайтов
-sudo certbot --nginx -d prospero365.tw1.su # генерируем SSL-сертификат
+sudo certbot --nginx -d hardtobecoder.tw1.su # генерируем SSL-сертификат
 sudo nginx -t # проверяем конфигурацию
 sudo nginx -s reload # перезагрузка Nginx
 sudo systemctl restart Nginx # перезагрузка сервиса Nginx
 ```
 
-Не забудьте изменить prospero365.tw1.su на ваш домен.
+Не забудьте изменить hardtobecoder.tw1.su на ваш домен.
 
 # Запуск
 Если вы все настроили правильно, перейдите в директорию с файлом Docker-compose.yml и запустите следующие команды:
@@ -333,7 +313,7 @@ sudo systemctl restart Nginx # перезагрузка сервиса Nginx
 sudo docker-compose build
 sudo docker-compose up -d
 cd nginx
-./run.sh
+./create.sh
 ```
 
 После того как вы перейдете на адрес сайта, вы увидите что ваше приложение доступно через HTTPS благодаря домену и SSL-сертификату!
